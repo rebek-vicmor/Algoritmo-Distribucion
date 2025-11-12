@@ -29,29 +29,28 @@ dist2 <- dist2 %>%
     TailLength = as.numeric(TailLength)
   )
 
-R.Comb18 <- dplyr::count (dist2, Comb18)
-R.Comb18 <- dplyr::mutate (R.Comb18, R5.1 = ceiling (R.Comb18$n/C.19))
-R.Comb18 <- dplyr::select (R.Comb18, -n)
+R.Comb18 <- dplyr::count (dist2, Comb18) %>%
+  dplyr::mutate(R5.1 = ceiling(n / C.19)) %>%
+  dplyr::select(-n)
 dist2 <- dplyr::merge (dist2, R.Comb18, by ="Comb18")
-ind.Comb.Encl <- dplyr::count (dist2, Encl18, Comb18)
-ind.Encl <- dplyr::select (ind.Comb.Encl, -Comb18)
-colnames(ind.Encl)[colnames(ind.Encl)=="n"] <- "ind.Encl18"
+ind.Encl <- dplyr::count (dist2, Encl18, Comb18) %>%
+  dplyr::select(-Comb18) %>%
+  dplyr::rename(ind.Encl18 = n)
 dist2 <- dplyr::merge (dist2, ind.Encl, by="Encl18")
 
-cer18 <- dplyr::select (ind.Comb.Encl, -n)
+cer18 <- dplyr::count (dist2, Encl18, Comb18) %>%
+  dplyr::select(-n)
 cer19 <- dplyr::select (trat.original, Encl19, Comb19)
-cer18.R1 <- cer18 
-colnames(cer18.R1)[colnames(cer18.R1)=="Encl18"] <- "Encl"
-cer19.R1 <- cer19
-colnames(cer19.R1)[colnames(cer19.R1)=="Encl19"] <- "Encl"
-R1.C18.C19 <- dplyr::merge (cer18.R1, cer19.R1, by="Encl")
-R1.n.caben <- dplyr::count (R1.C18.C19, Comb18, Comb19)
-R1.n.caben$Comb18_Comb19 <- paste (R1.n.caben $Comb18, R1.n.caben $Comb19, sep="_")
-R1.n.caben <- dplyr::select (R1.n.caben, -Comb18, -Comb19)
-R1.n.caben <- as.data.frame(R1.n.caben)
-colnames(R1.n.caben)[colnames(R1.n.caben)=="n"] <- "n.caben"
-R1.C18.C19$Comb18_Comb19 <- paste(R1.C18.C19$Comb18, R1.C18.C19$Comb19, sep="_")
-R1.C18.C19 <- dplyr::select (R1.C18.C19, -Comb18, -Comb19)
+cer18.R1 <- cer18 %>%
+  dplyr::rename(Encl = Encl18)
+cer19.R1 <- cer19 %>%
+  dplyr::rename(Encl = Encl19)
+R1.C18.C19 <- dplyr::merge (cer18.R1, cer19.R1, by="Encl") %>%
+  dplyr::mutate(Comb18_Comb19 = paste(Comb18, Comb19, sep = "_")) %>%
+  dplyr::select(Encl, Comb18_Comb19)
+R1.n.caben <- dplyr::count (R1.C18.C19, Comb18_Comb19) %>%
+  dplyr::rename(n.caben = n) %>%
+  as.data.frame()
 
 R1.1 <- seq_len(nrow(R1.n.caben))
 R1.2 <- seq_len(nrow(R1.n.caben))
@@ -168,11 +167,11 @@ repeat{
   
   #Calcular R5 y R5.1
   
-  R5 <- dplyr::count (dist, Comb18, Comb19)
-  R5$Comb18_Comb19 <- paste (R5$Comb18, R5$Comb19, sep="_")
-  R5 <- dplyr::select (R5, -Comb18, -Comb19)
-  colnames (R5) [colnames(R5)=="n"] <- "R5"
-  R5$R5 <- as.numeric (R5$R5)
+  R5 <- dplyr::count (dist, Comb18, Comb19) %>%
+    dplyr::mutate(Comb18_Comb19 = paste(Comb18, Comb19, sep = "_")) %>%
+    dplyr::select(Comb18_Comb19, n) %>%
+    dplyr::rename(R5 = n) %>%
+    dplyr::mutate(R5 = as.numeric(R5))
   
   dist$Comb18_Comb19 <- paste (dist$Comb18, dist$Comb19, sep="_")
   dist <- dplyr::merge (dist, R5, by="Comb18_Comb19")
@@ -332,13 +331,15 @@ repeat{
   
   dist$Comb18_Comb19 <- paste(dist$Comb18, dist$Comb19, sep="_")
   
-  R5.3 <-  dplyr::count (dist, Comb18, Comb19)
-  R5.3$n <- as.numeric (R5.3$n)
-  colnames(R5.3)[colnames(R5.3)=="n"] <- "R5.3"
-  R.Comb18 <- dplyr::count (dist, Comb18)
-  R.Comb18 <- dplyr::mutate (R.Comb18, balance = ceiling (R.Comb18$n/C.19))
-  R.Comb18 <- dplyr::select (R.Comb18, -n)
-  R5.3 <- dplyr::merge (R5.3, R.Comb18, by ="Comb18")
+  R5.3 <- dplyr::count (dist, Comb18, Comb19) %>%
+    dplyr::rename(R5.3 = n) %>%
+    dplyr::mutate(R5.3 = as.numeric(R5.3))
+  
+  R.Comb18 <- dplyr::count (dist, Comb18) %>%
+    dplyr::mutate(balance = ceiling(n / C.19)) %>%
+    dplyr::select(-n)
+  
+  R5.3 <- dplyr::merge (R5.3, R.Comb18, by = "Comb18")
   R5.3
   
   if (
@@ -1363,18 +1364,13 @@ chorlito <- dist
 
 media <- dist %>%
   dplyr::group_by (Comb19) %>%
-  dplyr::summarise (mean(SVL), var(SVL), 
-            mean(BodyConditionR), var(BodyConditionR), 
-            mean(TailLength), var(TailLength))
-
-colnames(media)[colnames(media)=="mean(SVL)"] <- "mean.SVL"
-colnames(media)[colnames(media)=="mean(BodyConditionR)"] <- "mean.BC"
-colnames(media)[colnames(media)=="mean(TailLength)"] <- "mean.TL"
-colnames(media)[colnames(media)=="var(SVL)"] <- "var.SVL"
-colnames(media)[colnames(media)=="var(BodyConditionR)"] <- "var.BC"
-colnames(media)[colnames(media)=="var(TailLength)"] <- "var.TL"
-
-media[,-1] <- round (media[, -1], 2)
+  dplyr::summarise (mean.SVL = mean(SVL), 
+                    var.SVL = var(SVL),
+                    mean.BC = mean(BodyConditionR), 
+                    var.BC = var(BodyConditionR),
+                    mean.TL = mean(TailLength), 
+                    var.TL = var(TailLength)) %>%
+  dplyr::mutate(dplyr::across(mean.SVL:var.TL, ~ round(., 2)))
 media
 plot (vector)
 
@@ -1422,18 +1418,13 @@ repeat{
       
       media <- dist %>%
         dplyr::group_by (Comb19) %>%
-        dplyr::summarise (mean(SVL), var(SVL), 
-                  mean(BodyConditionR), var(BodyConditionR), 
-                  mean(TailLength), var(TailLength))
-      
-      colnames(media)[colnames(media)=="mean(SVL)"] <- "mean.SVL"
-      colnames(media)[colnames(media)=="mean(BodyConditionR)"] <- "mean.BC"
-      colnames(media)[colnames(media)=="mean(TailLength)"] <- "mean.TL"
-      colnames(media)[colnames(media)=="var(SVL)"] <- "var.SVL"
-      colnames(media)[colnames(media)=="var(BodyConditionR)"] <- "var.BC"
-      colnames(media)[colnames(media)=="var(TailLength)"] <- "var.TL"
-      
-      media[,-1] <- round (media[, -1], 2)
+        dplyr::summarise (mean.SVL = mean(SVL), 
+                          var.SVL = var(SVL),
+                          mean.BC = mean(BodyConditionR), 
+                          var.BC = var(BodyConditionR),
+                          mean.TL = mean(TailLength), 
+                          var.TL = var(TailLength)) %>%
+        dplyr::mutate(dplyr::across(mean.SVL:var.TL, ~ round(., 2)))
       media
       
       ejemplo <- dplyr::mutate (ejemplo, Comb19.2 = sample(Comb19))
@@ -1455,16 +1446,13 @@ repeat{
       
       media2 <- dist %>%
         dplyr::group_by (Comb19) %>%
-        dplyr::summarise (mean(SVL), var(SVL), 
-                  mean(BodyConditionR), var(BodyConditionR), 
-                  mean(TailLength), var(TailLength))
-      
-      colnames(media2)[colnames(media2)=="mean(SVL)"] <- "mean.SVL"
-      colnames(media2)[colnames(media2)=="mean(BodyConditionR)"] <- "mean.BC"
-      colnames(media2)[colnames(media2)=="mean(TailLength)"] <- "mean.TL"
-      colnames(media2)[colnames(media2)=="var(SVL)"] <- "var.SVL"
-      colnames(media2)[colnames(media2)=="var(BodyConditionR)"] <- "var.BC"
-      colnames(media2)[colnames(media2)=="var(TailLength)"] <- "var.TL"
+        dplyr::summarise (mean.SVL = mean(SVL), 
+                          var.SVL = var(SVL),
+                          mean.BC = mean(BodyConditionR), 
+                          var.BC = var(BodyConditionR),
+                          mean.TL = mean(TailLength), 
+                          var.TL = var(TailLength)) %>%
+        dplyr::mutate(dplyr::across(mean.SVL:var.TL, ~ round(., 2)))
       
       media2[,-1] <- round (media2[, -1], 2)
       media2    
@@ -1844,17 +1832,18 @@ repeat{
   # Igual que R2, pero comprobando el n?mero de individuos de cada cercado
   # que va a cada cercado.
   
-  tabla.R4 <-  dplyr::count (dist, Encl19, Encl18)
-  tabla.R4$n <- as.numeric (tabla.R4$n)
-  colnames(tabla.R4)[colnames(tabla.R4)=="n"] <- "n.R4"
-  tabla.R4$Encl18_Encl19 <- paste(tabla.R4$Encl18, tabla.R4$Encl19, sep="_")
+  tabla.R4 <- dplyr::count (dist, Encl19, Encl18) %>%
+    dplyr::mutate(n = as.numeric(n)) %>%
+    dplyr::rename(n.R4 = n) %>%
+    dplyr::mutate(Encl18_Encl19 = paste(Encl18, Encl19, sep = "_")) %>%
+    dplyr::select(Encl18_Encl19, n.R4)
+  
   prueba <- dplyr::count (tabla.R4, Encl18)
   prueba <- dplyr::merge (prueba, R9, by="Encl18")
-  tabla.R4 <- dplyr::select (tabla.R4, -Encl19, -Encl18)
   
   dist$Encl18_Encl19 <- paste(dist$Encl18, dist$Encl19, sep="_")
   
-  dist<-dplyr::merge (dist, tabla.R4, by="Encl18_Encl19")
+  dist <- dplyr::merge(dist, tabla.R4, by="Encl18_Encl19")
 
   for(i in 1:nrow(prueba)){
     if (prueba$n.Encl18[i]>(Encl.19-1)){
@@ -1951,8 +1940,8 @@ repeat{
   }
   
   
-  tabla.R4.2 <-  dplyr::count (dist, Encl19, Encl18)
-  tabla.R4.2$n <- as.numeric (tabla.R4.2$n)
+  tabla.R4.2 <- dplyr::count (dist, Encl19, Encl18) %>%
+    dplyr::mutate(n = as.numeric(n))
   
   prueba <- dplyr::count (tabla.R4.2, Encl18)
   prueba <- dplyr::merge (prueba, R9, by="Encl18")
@@ -2051,15 +2040,16 @@ if(
     dist <- dist[with(dist, order(dist$Animal_number1)), ] # Reordenar la tabla 
     dist$Encl18_Encl19 <- paste(dist$Encl18, dist$Encl19, sep="_")
     dist$Encl18_Comb19 <- paste(dist$Encl18, dist$Comb19, sep="_")
-    gafas <- dplyr::count (dist, Encl18, Encl19)
-    gafas$Encl18_Encl19 <- paste(gafas$Encl18, gafas$Encl19, sep="_")
-    gafas <- dplyr::select (gafas, Encl18_Encl19, n)
-    colnames(gafas)[colnames(gafas)=="n"] <- "n.grapadora"
     
-    lentillas <- dplyr::count (dist, Encl18, Comb19)
-    lentillas$Encl18_Comb19 <- paste(lentillas$Encl18, lentillas$Comb19, sep="_")
-    lentillas <- dplyr::select (lentillas, Encl18_Comb19, n)
-    colnames(lentillas)[colnames(lentillas)=="n"] <- "n.celo"
+    gafas <- dplyr::count (dist, Encl18, Encl19) %>%
+      dplyr::mutate(Encl18_Encl19 = paste(Encl18, Encl19, sep = "_")) %>%
+      dplyr::select(Encl18_Encl19, n) %>%
+      dplyr::rename(n.grapadora = n)
+    
+    lentillas <- dplyr::count (dist, Encl18, Comb19) %>%
+      dplyr::mutate(Encl18_Comb19 = paste(Encl18, Comb19, sep = "_")) %>%
+      dplyr::select(Encl18_Comb19, n) %>%
+      dplyr::rename(n.celo = n)
     
     dist <- dplyr::merge (dist, gafas, by="Encl18_Encl19")
     dist <- dplyr::merge (dist, lentillas, by="Encl18_Comb19")
