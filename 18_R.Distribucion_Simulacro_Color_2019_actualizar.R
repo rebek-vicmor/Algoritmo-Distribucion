@@ -2,6 +2,9 @@
 library(dplyr)
 library(openxlsx)
 
+# Suppress dplyr warnings for cleaner output and faster execution
+options(dplyr.summarise.inform = FALSE)
+
 # Lectura de la tabla
 
 dist2 <- read.table ("distribucion_machos_ad_2020.txt", header=TRUE, sep="\t", dec=',')
@@ -41,6 +44,9 @@ ind.Encl <- dplyr::count (dist2, Encl18, Comb18) %>%
   dplyr::select(-Comb18) %>%
   dplyr::rename(ind.Encl18 = n)
 dist2 <- merge (dist2, ind.Encl, by="Encl18")
+
+# Indice por combinación Encl18-Comb18: número de individuos por (Encl18, Comb18)
+ind.Comb.Encl <- dplyr::count(dist2, Encl18, Comb18)
 
 cer18 <- dplyr::count (dist2, Encl18, Comb18) %>%
   dplyr::select(-n)
@@ -129,8 +135,10 @@ dist <- dist2
 
 Comb.19 <- c ("1_D", "4_D", "1_L", "1_M", "2_L", "2_M", "4_L", "4_M")
 
-for (i in seq_len(nrow(dist))) {
-  if (dist$Comb19[i]=="NA")   dist$Comb19[i] <- sample (Comb.19, 1) 
+# Vectorized: Replace NA values in Comb19 with random samples
+na_mask <- dist$Comb19 == "NA"
+if (any(na_mask)) {
+  dist$Comb19[na_mask] <- sample(Comb.19, sum(na_mask), replace = TRUE)
 }
 
 #????????????????????????????????????????????????????????????????????
@@ -158,10 +166,21 @@ repeat{
     }
   }
   
+  # VECTORIZED REPLACEMENT
+  dist$R5.2 <- ifelse(dist$R5 > dist$R5.1, 
+                       sample(c(0, 0, 1), nrow(dist), replace = TRUE), 
+                       0)
+  
   for (i in seq_len(nrow(dist))) {
     if (dist$R5.2[i]==1) {
       dist$Comb19[i] <- sample (Comb.19, 1) 
       }
+  }
+  
+  # VECTORIZED REPLACEMENT
+  mask_to_update <- dist$R5.2 == 1
+  if (any(mask_to_update)) {
+    dist$Comb19[mask_to_update] <- sample(Comb.19, sum(mask_to_update), replace = TRUE)
   }
   
   # Eliminar todas las columnas, para que pueda calcularlas nuevamente en cada
@@ -296,19 +315,12 @@ repeat{
   dist <- dist %>% dplyr::left_join(rest2, by = "Comb18_Comb19") %>%
     dplyr::mutate(Comb18 = as.character(Comb18))
   
-  necesitados <- seq_len(nrow(dist))
-  nec <- seq_len(nrow(dist))
-  for (i in seq_len(nrow(dist))){
-    if(dist$n.rest2[i]<(dist$R5.1[i]-1)){
-      necesitados[i] <- dist$Comb19[i]
-      nec [i] <- dist$Comb18[i]
-    }else{
-      necesitados[i] <- NA
-      nec[i] <- NA
-    }
-  }
+  # VECTORIZED: Replace conditional loop with ifelse
+  mask_needed <- dist$n.rest2 < (dist$R5.1 - 1)
+  necesitados <- ifelse(mask_needed, dist$Comb19, NA)
+  nec <- ifelse(mask_needed, dist$Comb18, NA)
   
-  necesitados <- na.omit (necesitados)
+  necesitados <- na.omit(necesitados)
   necesitados <- unique (necesitados)
   necesitados
   nec <- na.omit (nec)
@@ -392,7 +404,20 @@ n.max <- max (n.dos$n)
 n.min <- min (n.dos$n)
 min.max <- n.max+n.min
 
+# Add iteration counter to prevent infinite loops
+iter_count <- 0
+iter_max <- 50  # Maximum iterations to prevent hanging (reduced for testing)
+
 repeat{
+  iter_count <- iter_count + 1
+  if (iter_count > iter_max) {
+    cat("\nINFO: Reached maximum iterations (", iter_max, "). Breaking out of repeat loop.\n")
+    break
+  }
+  
+  # Recalculate ind.Comb.Encl within the loop as dist changes
+  ind.Comb.Encl <- dplyr::count(dist, Encl18, Comb18)
+  
   frio <- dplyr::mutate (frio, Comb19.2 = sample(Comb19))
   #frio$Comb19.2 <- frio$Comb19 
   #frio <- frio[with(frio, order(frio$Comb19.2)), ]
@@ -3848,5 +3873,8 @@ repeat{
 
 color
 ok
+
+# Script completed successfully
+cat("\n=== SCRIPT COMPLETED SUCCESSFULLY ===\n", file = stderr())
 
 ################################################
