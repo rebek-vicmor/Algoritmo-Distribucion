@@ -29,29 +29,29 @@ dist2 <- dist2 %>%
     TailLength = as.numeric(TailLength)
   )
 
-R.Comb18 <- count (dist2, Comb18)
-R.Comb18 <- mutate(R.Comb18, R5.1 = ceiling (R.Comb18$n/C.19))
-R.Comb18 <- select (R.Comb18, -n)
-dist2 <- merge (dist2, R.Comb18, by ="Comb18")
-ind.Comb.Encl <- count (dist2, Encl18, Comb18)
-ind.Encl <- select (ind.Comb.Encl, -Comb18)
+R.Comb18 <- dplyr::count (dist2, Comb18)
+R.Comb18 <- dplyr::mutate (R.Comb18, R5.1 = ceiling (R.Comb18$n/C.19))
+R.Comb18 <- dplyr::select (R.Comb18, -n)
+dist2 <- dplyr::merge (dist2, R.Comb18, by ="Comb18")
+ind.Comb.Encl <- dplyr::count (dist2, Encl18, Comb18)
+ind.Encl <- dplyr::select (ind.Comb.Encl, -Comb18)
 colnames(ind.Encl)[colnames(ind.Encl)=="n"] <- "ind.Encl18"
-dist2 <- merge (dist2, ind.Encl, by="Encl18")
+dist2 <- dplyr::merge (dist2, ind.Encl, by="Encl18")
 
-cer18 <- select (ind.Comb.Encl, -n)
-cer19 <- select (trat.original, Encl19, Comb19)
+cer18 <- dplyr::select (ind.Comb.Encl, -n)
+cer19 <- dplyr::select (trat.original, Encl19, Comb19)
 cer18.R1 <- cer18 
 colnames(cer18.R1)[colnames(cer18.R1)=="Encl18"] <- "Encl"
 cer19.R1 <- cer19
 colnames(cer19.R1)[colnames(cer19.R1)=="Encl19"] <- "Encl"
-R1.C18.C19 <- merge (cer18.R1, cer19.R1, by="Encl")
-R1.n.caben <- count (R1.C18.C19, Comb18, Comb19)
+R1.C18.C19 <- dplyr::merge (cer18.R1, cer19.R1, by="Encl")
+R1.n.caben <- dplyr::count (R1.C18.C19, Comb18, Comb19)
 R1.n.caben$Comb18_Comb19 <- paste (R1.n.caben $Comb18, R1.n.caben $Comb19, sep="_")
-R1.n.caben <- select (R1.n.caben, -Comb18, -Comb19)
+R1.n.caben <- dplyr::select (R1.n.caben, -Comb18, -Comb19)
 R1.n.caben <- as.data.frame(R1.n.caben)
 colnames(R1.n.caben)[colnames(R1.n.caben)=="n"] <- "n.caben"
 R1.C18.C19$Comb18_Comb19 <- paste(R1.C18.C19$Comb18, R1.C18.C19$Comb19, sep="_")
-R1.C18.C19 <- select (R1.C18.C19, -Comb18, -Comb19)
+R1.C18.C19 <- dplyr::select (R1.C18.C19, -Comb18, -Comb19)
 
 R1.1 <- seq_len(nrow(R1.n.caben))
 R1.2 <- seq_len(nrow(R1.n.caben))
@@ -164,18 +164,18 @@ repeat{
   # Eliminar todas las columnas, para que pueda calcularlas nuevamente en cada
   # vuelta del bucle
   
-  dist <- select(dist, -Comb18_Comb19, -R5, -R5.2)
+  dist <- dplyr::select (dist, -Comb18_Comb19, -R5, -R5.2)
   
   #Calcular R5 y R5.1
   
-  R5 <- count (dist, Comb18, Comb19)
+  R5 <- dplyr::count (dist, Comb18, Comb19)
   R5$Comb18_Comb19 <- paste (R5$Comb18, R5$Comb19, sep="_")
-  R5 <- select (R5, -Comb18, -Comb19)
+  R5 <- dplyr::select (R5, -Comb18, -Comb19)
   colnames (R5) [colnames(R5)=="n"] <- "R5"
   R5$R5 <- as.numeric (R5$R5)
   
   dist$Comb18_Comb19 <- paste (dist$Comb18, dist$Comb19, sep="_")
-  dist <- merge (dist, R5, by="Comb18_Comb19")
+  dist <- dplyr::merge (dist, R5, by="Comb18_Comb19")
   
   if(
     #R
@@ -196,14 +196,14 @@ repeat {
 #Mismo n?mero de individuos en todos los tratamientos
 repeat {
   
-  dist <- select (dist, -n.C19, -n.C18.C19)
+  dist <- dplyr::select (dist, -n.C19, -n.C18.C19)
   dist$Comb18_Comb19 <- paste (dist$Comb18, dist$Comb19, sep="_")
   
-  tabla.R3 <- count(dist, Comb19) %>%
+  tabla.R3 <- dplyr::count (dist, Comb19) %>%
     dplyr::mutate(n = as.numeric(n)) %>%
     dplyr::rename(n.C19 = n)
 
-  R3 <- count(dist, Comb18, Comb19) %>%
+  R3 <- dplyr::count (dist, Comb18, Comb19) %>%
     dplyr::mutate(
       Comb18 = as.character(Comb18),
       n.C18.C19 = as.numeric(n)
@@ -255,9 +255,9 @@ repeat {
     cambiables <-  C.C18
   } 
   
-  R3 <- select (R3, -Comb18, -Comb19)
+  R3 <- dplyr::select (R3, -Comb18, -Comb19)
   
-  dist <- merge (dist, R3, by="Comb18_Comb19")
+  dist <- dplyr::merge (dist, R3, by="Comb18_Comb19")
   
   dist$ordenar <- sample(seq_len(nrow(dist)), replace=FALSE)
   dist <- dist[with(dist, order(dist$ordenar)), ] 
@@ -275,7 +275,7 @@ repeat {
     }
   }
   
-  rest <- count (dist, Comb19)
+  rest <- dplyr::count (dist, Comb19)
   rest 
   
   if(
@@ -289,7 +289,7 @@ repeat{
   
   dist <- dist %>% dplyr::select(-n.rest2) %>%
     dplyr::mutate(Comb18_Comb19 = paste(Comb18, Comb19, sep = "_"))
-  rest2 <- dist %>% count(Comb18_Comb19) %>% dplyr::rename(n.rest2 = n)
+  rest2 <- dist %>% dplyr::count (Comb18_Comb19) %>% dplyr::rename(n.rest2 = n)
   dist <- dist %>% dplyr::left_join(rest2, by = "Comb18_Comb19") %>%
     dplyr::mutate(Comb18 = as.character(Comb18))
   
@@ -332,13 +332,13 @@ repeat{
   
   dist$Comb18_Comb19 <- paste(dist$Comb18, dist$Comb19, sep="_")
   
-  R5.3 <-  count(dist, Comb18, Comb19)
+  R5.3 <-  dplyr::count (dist, Comb18, Comb19)
   R5.3$n <- as.numeric (R5.3$n)
   colnames(R5.3)[colnames(R5.3)=="n"] <- "R5.3"
-  R.Comb18 <- count (dist, Comb18)
-  R.Comb18 <- mutate(R.Comb18, balance = ceiling (R.Comb18$n/C.19))
-  R.Comb18 <- select (R.Comb18, -n)
-  R5.3 <- merge (R5.3, R.Comb18, by ="Comb18")
+  R.Comb18 <- dplyr::count (dist, Comb18)
+  R.Comb18 <- dplyr::mutate (R.Comb18, balance = ceiling (R.Comb18$n/C.19))
+  R.Comb18 <- dplyr::select (R.Comb18, -n)
+  R5.3 <- dplyr::merge (R5.3, R.Comb18, by ="Comb18")
   R5.3
   
   if (
@@ -348,7 +348,7 @@ repeat{
     
   {break}
 }
-disco <- count (dist, Comb19)
+disco <- dplyr::count (dist, Comb19)
 
 if (all(disco$n==8)){break}}
 
@@ -358,7 +358,7 @@ dist <- dist %>%
   dplyr::arrange(Comb18) %>%
   dplyr::mutate(fila = row_number())
 
-#dist <- select(dist, -R5)
+#dist <- dplyr::select (dist, -R5)
 
 dist <- dist %>% dplyr::mutate(Comb18 = as.factor(Comb18))
 guante <- levels (dist$Comb18)
@@ -370,35 +370,35 @@ contar.hasta <- length(guante)
 repeat {
 contar <- contar+1
   
-R5 <- count (dist, Encl18, Comb18, Comb19)
+R5 <- dplyr::count (dist, Encl18, Comb18, Comb19)
 
 R5$Encl18 <- as.character (R5$Encl18)
 R5$Comb18 <- as.character (R5$Comb18)
 
-dist3 <- select (dist, fila, Encl18, Comb18, Comb19)
+dist3 <- dplyr::select (dist, fila, Encl18, Comb18, Comb19)
 frio <- dist3[dist3$Comb18 == guante[1], ] 
 frio
 
 guante <- guante [-c(1)]
 guante 
 
-n.dos <- count (frio, Encl18)
+n.dos <- dplyr::count (frio, Encl18)
 n.max <- max (n.dos$n)
 n.min <- min (n.dos$n)
 min.max <- n.max+n.min
 
 repeat{
-  frio <- mutate(frio, Comb19.2 = sample(Comb19))
+  frio <- dplyr::mutate (frio, Comb19.2 = sample(Comb19))
   #frio$Comb19.2 <- frio$Comb19 
   #frio <- frio[with(frio, order(frio$Comb19.2)), ]
-  #R6.1 <- count (frio, Encl18, Comb19)
-  R6.1 <- count (frio, Encl18, Comb19.2)
+  #R6.1 <- dplyr::count (frio, Encl18, Comb19)
+  R6.1 <- dplyr::count (frio, Encl18, Comb19.2)
   R6.1$Comb18_Comb19 <- paste (frio$Comb18[1],  R6.1$Comb19.2, sep="_")
-  R6 <- count (R6.1, Encl18, n)
+  R6 <- dplyr::count (R6.1, Encl18, n)
   colnames(R6)[colnames(R6)=="nn"] <- "duplicado"
   R6$gordi <- "NA"
   colnames(n.dos)[colnames(n.dos)=="n"] <- "n.ind"
-  R6 <- merge (R6, n.dos, by="Encl18")
+  R6 <- dplyr::merge (R6, n.dos, by="Encl18")
   
   for(i in seq_len(nrow(R6))){
     if ((R6$n[i]==1)&&(R6$n.ind[i]<=C.19)){   
@@ -450,9 +450,9 @@ repeat{
   R6.1$ok <- as.numeric (R6.1$ok)
   
   frio$Comb18_Comb19 <- paste (frio$Comb18,  frio$Comb19, sep="_")
-  R6.1.prueba <- count (frio, Comb18_Comb19)
+  R6.1.prueba <- dplyr::count (frio, Comb18_Comb19)
   colnames(R6.1.prueba)[colnames(R6.1.prueba)=="n"] <- "n.max"
-  R6.1 <- merge (R6.1, R6.1.prueba, by="Comb18_Comb19")
+  R6.1 <- dplyr::merge (R6.1, R6.1.prueba, by="Comb18_Comb19")
   
   for(i in seq_len(nrow(R6.1))){
     if ((R6.1$ok[i]==1)&&
@@ -461,10 +461,10 @@ repeat{
     } 
   }
   
-  R6.1 <- select (R6.1, -n.max)
+  R6.1 <- dplyr::select (R6.1, -n.max)
   R6.1$ok <- as.numeric (R6.1$ok)
   
-  R6.1.1 <- mutate (R6.1, fila=row_number())
+  R6.1.1 <- dplyr::mutate (R6.1, fila=row_number())
   
   for (i in seq_len(nrow(R6.1.1))) {
     if     ((R6.1.1$Comb18_Comb19[i] %in% R1.1)&&
@@ -475,10 +475,10 @@ repeat{
   }
   
   #-
-  papel <- count (dist, Comb18, Comb19)
+  papel <- dplyr::count (dist, Comb18, Comb19)
   papel$Comb18_Comb19 <- paste (papel$Comb18,  papel$Comb19, sep="_")
   
-  merge3 <- merge (R1.C18.C19, R6.1.1, by="Comb18_Comb19")
+  merge3 <- dplyr::merge (R1.C18.C19, R6.1.1, by="Comb18_Comb19")
   if (nrow(merge3)==0){
     merge3 <- R6.1.1
     merge3$ok2 <- 0
@@ -514,8 +514,8 @@ repeat{
     {merge3$ok2[i] <- 0}
   }
   merge3
-  merge4 <- select (merge3, ok2, fila)
-  merge5 <- merge (R6.1.1, merge4, by="fila", all=TRUE)
+  merge4 <- dplyr::select (merge3, ok2, fila)
+  merge5 <- dplyr::merge (R6.1.1, merge4, by="fila", all=TRUE)
   merge5$ok2[is.na(merge5$ok2)] <- 0  
   
   R6
@@ -532,8 +532,8 @@ repeat{
 
 
 
-correcto <- select (frio, fila, Comb19.2)
-dist <- merge (dist, correcto, by ="fila", all=TRUE)
+correcto <- dplyr::select (frio, fila, Comb19.2)
+dist <- dplyr::merge (dist, correcto, by ="fila", all=TRUE)
 dist$Comb19.2[is.na(dist$Comb19.2)] <- 0
 
 for(i in seq_len(nrow(dist))){
@@ -542,7 +542,7 @@ for(i in seq_len(nrow(dist))){
   }
 }
 
-dist <- select (dist, -Comb19)
+dist <- dplyr::select (dist, -Comb19)
 colnames (dist) [colnames(dist)=="Comb19.2"] <- "Comb19"
 dist$Comb18_Comb19 <- paste (dist$Comb18, dist$Comb19, sep="_")
 
@@ -559,8 +559,8 @@ if (contar==contar.hasta)
 
 
 
-R5 <- count (dist, Encl18, Comb18, Comb19)
-R7 <- count (R5, n)
+R5 <- dplyr::count (dist, Encl18, Comb18, Comb19)
+R7 <- dplyr::count (R5, n)
 R7
 
 
@@ -584,7 +584,7 @@ R7
 
 dist <- dist %>% dplyr::arrange(Encl18)
 
-#dist <- select(dist, -R5)
+#dist <- dplyr::select (dist, -R5)
 
 #repeat{
 
@@ -599,7 +599,7 @@ repeat {
   contar <- contar+1
   
   dist <- dist %>% dplyr::arrange(fila)
-  dist4 <- select(dist, fila, Encl18, Comb19)
+  dist4 <- dplyr::select (dist, fila, Encl18, Comb19)
   
   nose <- dist4[dist4$Encl18 == levels.Encl18[1], ]  
   
@@ -612,8 +612,8 @@ repeat {
   nose <- nose %>% dplyr::mutate(Comb19.2 = sample(Comb19))
   nose
   
-  si <- select (nose, fila, Comb19.2)
-  dist <- merge (dist, si, by ="fila", all=TRUE)
+  si <- dplyr::select (nose, fila, Comb19.2)
+  dist <- dplyr::merge (dist, si, by ="fila", all=TRUE)
   dist$Comb19.2[is.na(dist$Comb19.2)] <- 0
   
   for(i in seq_len(nrow(dist))){
@@ -622,7 +622,7 @@ repeat {
     }
   }
   
-  dist <- select (dist, -Comb19)
+  dist <- dplyr::select (dist, -Comb19)
   colnames (dist) [colnames(dist)=="Comb19.2"] <- "Comb19"
   dist$Comb18_Comb19 <- paste (dist$Comb18, dist$Comb19, sep="_")
   
@@ -647,14 +647,14 @@ cascos <- 100
 repeat{
   
   morfos <- dist %>%
-    group_by(Comb19) %>%
-    summarise(sum(O), sum(Y), sum(W))
+    dplyr::group_by (Comb19) %>%
+    dplyr::summarise (sum(O), sum(Y), sum(W))
   colnames.morfos <- c ("Comb19", "O", "Y", "W")
   colnames(morfos) <- colnames.morfos
   morfos
   
   morfos1 <- morfos
-  morfos1 <- select (morfos1, -Comb19) 
+  morfos1 <- dplyr::select (morfos1, -Comb19) 
   ok <- morfos1
   
   for (i in seq_len(nrow(morfos1))){
@@ -721,7 +721,7 @@ repeat{
       okis <- okis[-c(1)]
     }
   }
-  count (dist.morfos, Comb19)
+  dplyr::count (dist.morfos, Comb19)
   
   ok.original <- seq_len(nrow(morfos))
   for (i in seq_len(nrow(morfos))){
@@ -741,20 +741,20 @@ repeat{
   mando <- 0  
   repeat {
     
-  dist.morfos4 <- select (dist.morfos, fila, Encl18, Comb19)
+  dist.morfos4 <- dplyr::select (dist.morfos, fila, Encl18, Comb19)
   
   dist.morfos4 <- dist.morfos4 %>%
-    group_by(Encl18)
-  dist.morfos4 <- mutate(dist.morfos4, Comb19.2 = sample(Comb19))
+    dplyr::group_by (Encl18)
+  dist.morfos4 <- dplyr::mutate (dist.morfos4, Comb19.2 = sample(Comb19))
   
   dist.morfos$Comb19.2 <- dist.morfos4$Comb19.2
 
-  dist.morfos <- select (dist.morfos, -Comb19)
+  dist.morfos <- dplyr::select (dist.morfos, -Comb19)
   colnames (dist.morfos) [colnames(dist.morfos)=="Comb19.2"] <- "Comb19"
       
   colnames (dist.morfos) [colnames(dist.morfos)=="Comb19"] <- "Comb19.3"
-  Comb19.3 <- select (dist.morfos, fila, Comb19.3)
-  dist <- merge (dist, Comb19.3, by="fila", all=TRUE)
+  Comb19.3 <- dplyr::select (dist.morfos, fila, Comb19.3)
+  dist <- dplyr::merge (dist, Comb19.3, by="fila", all=TRUE)
   dist$Comb19.3[is.na(dist$Comb19.3)] <- 0  
   colnames (dist.morfos) [colnames(dist.morfos)=="Comb19.3"] <- "Comb19"
       
@@ -763,19 +763,19 @@ repeat{
       dist$Comb19.3[i] <-  dist$Comb19[i]
     }
   }
-  dist <- select (dist, -Comb19)
+  dist <- dplyr::select (dist, -Comb19)
   colnames (dist) [colnames(dist)=="Comb19.3"] <- "Comb19"
   dist$Comb18_Comb19 <- paste (dist$Comb18, dist$Comb19, sep="_")
       
   color <- dist %>%
-    group_by(Comb19) %>%
-    summarise(sum(WY), sum(WO), sum(WW), sum(YY), sum(YO), sum(OO))
+    dplyr::group_by (Comb19) %>%
+    dplyr::summarise (sum(WY), sum(WO), sum(WW), sum(YY), sum(YO), sum(OO))
   colnames.color <- c ("Comb19", "WY", "WO", "WW", "YY", "YO", "OO")
   colnames(color) <- colnames.color
   color
     
   color1 <- color
-  color1 <- select (color1, -Comb19) 
+  color1 <- dplyr::select (color1, -Comb19) 
   ok.color <- color1
     
   for (i in seq_len(nrow(color1))){
@@ -797,8 +797,8 @@ repeat{
       
       dist.morfos <- dist.morfos.original
       colnames (dist.morfos) [colnames(dist.morfos)=="Comb19"] <- "Comb19.3"
-      Comb19.3 <- select (dist.morfos, fila, Comb19.3)
-      dist <- merge (dist, Comb19.3, by="fila", all=TRUE)
+      Comb19.3 <- dplyr::select (dist.morfos, fila, Comb19.3)
+      dist <- dplyr::merge (dist, Comb19.3, by="fila", all=TRUE)
       dist$Comb19.3[is.na(dist$Comb19.3)] <- 0  
       colnames (dist.morfos) [colnames(dist.morfos)=="Comb19.3"] <- "Comb19"
       
@@ -808,15 +808,15 @@ repeat{
         }
       }
       
-      dist <- select (dist, -Comb19)
+      dist <- dplyr::select (dist, -Comb19)
       colnames (dist) [colnames(dist)=="Comb19.3"] <- "Comb19"
       dist$Comb18_Comb19 <- paste (dist$Comb18, dist$Comb19, sep="_")
       
     }
     
     morfos <- dist %>%
-      group_by(Comb19) %>%
-      summarise(sum(O), sum(Y), sum(W))
+      dplyr::group_by (Comb19) %>%
+      dplyr::summarise (sum(O), sum(Y), sum(W))
     colnames.morfos <- c ("Comb19", "O", "Y", "W")
     colnames(morfos) <- colnames.morfos
     morfos
@@ -851,7 +851,7 @@ repeat{
 }
 
 morfos1 <- morfos
-morfos1 <- select (morfos1, -Comb19) 
+morfos1 <- dplyr::select (morfos1, -Comb19) 
 ok.morfos <- morfos1
 
 for (i in seq_len(nrow(morfos1))){
@@ -878,14 +878,14 @@ cascos <- 100
 repeat{
   
   morfos <- dist %>%
-    group_by(Comb19) %>%
-    summarise(sum(O), sum(Y), sum(W))
+    dplyr::group_by (Comb19) %>%
+    dplyr::summarise (sum(O), sum(Y), sum(W))
   colnames.morfos <- c ("Comb19", "O", "Y", "W")
   colnames(morfos) <- colnames.morfos
   morfos
   
   morfos1 <- morfos
-  morfos1 <- select (morfos1, -Comb19) 
+  morfos1 <- dplyr::select (morfos1, -Comb19) 
   ok <- morfos1
   
   for (i in seq_len(nrow(morfos1))){
@@ -952,7 +952,7 @@ repeat{
       okis <- okis[-c(1)]
     }
   }
-  count (dist.morfos, Comb19)
+  dplyr::count (dist.morfos, Comb19)
   
   ok.original <- seq_len(nrow(morfos))
   for (i in seq_len(nrow(morfos))){
@@ -973,20 +973,20 @@ repeat{
   
   repeat {
     
-    dist.morfos4 <- select (dist.morfos, fila, Encl18, Comb19)
+    dist.morfos4 <- dplyr::select (dist.morfos, fila, Encl18, Comb19)
     
     dist.morfos4 <- dist.morfos4 %>%
-      group_by(Encl18)
-    dist.morfos4 <- mutate(dist.morfos4, Comb19.2 = sample(Comb19))
+      dplyr::group_by (Encl18)
+    dist.morfos4 <- dplyr::mutate (dist.morfos4, Comb19.2 = sample(Comb19))
     
     dist.morfos$Comb19.2 <- dist.morfos4$Comb19.2
     
-    dist.morfos <- select (dist.morfos, -Comb19)
+    dist.morfos <- dplyr::select (dist.morfos, -Comb19)
     colnames (dist.morfos) [colnames(dist.morfos)=="Comb19.2"] <- "Comb19"
     
     colnames (dist.morfos) [colnames(dist.morfos)=="Comb19"] <- "Comb19.3"
-    Comb19.3 <- select (dist.morfos, fila, Comb19.3)
-    dist <- merge (dist, Comb19.3, by="fila", all=TRUE)
+    Comb19.3 <- dplyr::select (dist.morfos, fila, Comb19.3)
+    dist <- dplyr::merge (dist, Comb19.3, by="fila", all=TRUE)
     dist$Comb19.3[is.na(dist$Comb19.3)] <- 0  
     colnames (dist.morfos) [colnames(dist.morfos)=="Comb19.3"] <- "Comb19"
     
@@ -995,19 +995,19 @@ repeat{
         dist$Comb19.3[i] <-  dist$Comb19[i]
       }
     }
-    dist <- select (dist, -Comb19)
+    dist <- dplyr::select (dist, -Comb19)
     colnames (dist) [colnames(dist)=="Comb19.3"] <- "Comb19"
     dist$Comb18_Comb19 <- paste (dist$Comb18, dist$Comb19, sep="_")
     
     color <- dist %>%
-      group_by(Comb19) %>%
-      summarise(sum(WY), sum(WO), sum(WW), sum(YY), sum(YO), sum(OO))
+      dplyr::group_by (Comb19) %>%
+      dplyr::summarise (sum(WY), sum(WO), sum(WW), sum(YY), sum(YO), sum(OO))
     colnames.color <- c ("Comb19", "WY", "WO", "WW", "YY", "YO", "OO")
     colnames(color) <- colnames.color
     color
     
     color1 <- color
-    color1 <- select (color1, -Comb19) 
+    color1 <- dplyr::select (color1, -Comb19) 
     ok.color <- color1
     
   for (i in seq_len(nrow(color1))){
@@ -1027,8 +1027,8 @@ repeat{
       
       dist.morfos <- dist.morfos.original
       colnames (dist.morfos) [colnames(dist.morfos)=="Comb19"] <- "Comb19.3"
-      Comb19.3 <- select (dist.morfos, fila, Comb19.3)
-      dist <- merge (dist, Comb19.3, by="fila", all=TRUE)
+      Comb19.3 <- dplyr::select (dist.morfos, fila, Comb19.3)
+      dist <- dplyr::merge (dist, Comb19.3, by="fila", all=TRUE)
       dist$Comb19.3[is.na(dist$Comb19.3)] <- 0  
       colnames (dist.morfos) [colnames(dist.morfos)=="Comb19.3"] <- "Comb19"
       
@@ -1038,15 +1038,15 @@ repeat{
         }
       }
       
-      dist <- select (dist, -Comb19)
+      dist <- dplyr::select (dist, -Comb19)
       colnames (dist) [colnames(dist)=="Comb19.3"] <- "Comb19"
       dist$Comb18_Comb19 <- paste (dist$Comb18, dist$Comb19, sep="_")
       
     }
     
     morfos <- dist %>%
-      group_by(Comb19) %>%
-      summarise(sum(O), sum(Y), sum(W))
+      dplyr::group_by (Comb19) %>%
+      dplyr::summarise (sum(O), sum(Y), sum(W))
     colnames.morfos <- c ("Comb19", "O", "Y", "W")
     colnames(morfos) <- colnames.morfos
     morfos
@@ -1083,7 +1083,7 @@ repeat{
 }
 
 morfos1 <- morfos
-morfos1 <- select (morfos1, -Comb19) 
+morfos1 <- dplyr::select (morfos1, -Comb19) 
 ok.morfos <- morfos1
 
 for (i in seq_len(nrow(morfos1))){
@@ -1110,14 +1110,14 @@ cascos <- 100
 repeat{
   
   morfos <- dist %>%
-    group_by(Comb19) %>%
-    summarise(sum(O), sum(Y), sum(W))
+    dplyr::group_by (Comb19) %>%
+    dplyr::summarise (sum(O), sum(Y), sum(W))
   colnames.morfos <- c ("Comb19", "O", "Y", "W")
   colnames(morfos) <- colnames.morfos
   morfos
   
   morfos1 <- morfos
-  morfos1 <- select (morfos1, -Comb19) 
+  morfos1 <- dplyr::select (morfos1, -Comb19) 
   ok <- morfos1
   
   for (i in seq_len(nrow(morfos1))){
@@ -1184,7 +1184,7 @@ repeat{
       okis <- okis[-c(1)]
     }
   }
-  count (dist.morfos, Comb19)
+  dplyr::count (dist.morfos, Comb19)
   
   ok.original <- seq_len(nrow(morfos))
   for (i in seq_len(nrow(morfos))){
@@ -1205,20 +1205,20 @@ repeat{
   
   repeat {
     
-    dist.morfos4 <- select (dist.morfos, fila, Encl18, Comb19)
+    dist.morfos4 <- dplyr::select (dist.morfos, fila, Encl18, Comb19)
     
     dist.morfos4 <- dist.morfos4 %>%
-      group_by(Encl18)
-    dist.morfos4 <- mutate(dist.morfos4, Comb19.2 = sample(Comb19))
+      dplyr::group_by (Encl18)
+    dist.morfos4 <- dplyr::mutate (dist.morfos4, Comb19.2 = sample(Comb19))
     
     dist.morfos$Comb19.2 <- dist.morfos4$Comb19.2
     
-    dist.morfos <- select (dist.morfos, -Comb19)
+    dist.morfos <- dplyr::select (dist.morfos, -Comb19)
     colnames (dist.morfos) [colnames(dist.morfos)=="Comb19.2"] <- "Comb19"
     
     colnames (dist.morfos) [colnames(dist.morfos)=="Comb19"] <- "Comb19.3"
-    Comb19.3 <- select (dist.morfos, fila, Comb19.3)
-    dist <- merge (dist, Comb19.3, by="fila", all=TRUE)
+    Comb19.3 <- dplyr::select (dist.morfos, fila, Comb19.3)
+    dist <- dplyr::merge (dist, Comb19.3, by="fila", all=TRUE)
     dist$Comb19.3[is.na(dist$Comb19.3)] <- 0  
     colnames (dist.morfos) [colnames(dist.morfos)=="Comb19.3"] <- "Comb19"
     
@@ -1227,19 +1227,19 @@ repeat{
         dist$Comb19.3[i] <-  dist$Comb19[i]
       }
     }
-    dist <- select (dist, -Comb19)
+    dist <- dplyr::select (dist, -Comb19)
     colnames (dist) [colnames(dist)=="Comb19.3"] <- "Comb19"
     dist$Comb18_Comb19 <- paste (dist$Comb18, dist$Comb19, sep="_")
     
     color <- dist %>%
-      group_by(Comb19) %>%
-      summarise(sum(WY), sum(WO), sum(WW), sum(YY), sum(YO), sum(OO))
+      dplyr::group_by (Comb19) %>%
+      dplyr::summarise (sum(WY), sum(WO), sum(WW), sum(YY), sum(YO), sum(OO))
     colnames.color <- c ("Comb19", "WY", "WO", "WW", "YY", "YO", "OO")
     colnames(color) <- colnames.color
     color
     
     color1 <- color
-    color1 <- select (color1, -Comb19) 
+    color1 <- dplyr::select (color1, -Comb19) 
     ok.color <- color1
     
     for (i in 1:nrow(color1)){
@@ -1259,8 +1259,8 @@ repeat{
       
       dist.morfos <- dist.morfos.original
       colnames (dist.morfos) [colnames(dist.morfos)=="Comb19"] <- "Comb19.3"
-      Comb19.3 <- select (dist.morfos, fila, Comb19.3)
-      dist <- merge (dist, Comb19.3, by="fila", all=TRUE)
+      Comb19.3 <- dplyr::select (dist.morfos, fila, Comb19.3)
+      dist <- dplyr::merge (dist, Comb19.3, by="fila", all=TRUE)
       dist$Comb19.3[is.na(dist$Comb19.3)] <- 0  
       colnames (dist.morfos) [colnames(dist.morfos)=="Comb19.3"] <- "Comb19"
       
@@ -1270,15 +1270,15 @@ repeat{
         }
       }
       
-      dist <- select (dist, -Comb19)
+      dist <- dplyr::select (dist, -Comb19)
       colnames (dist) [colnames(dist)=="Comb19.3"] <- "Comb19"
       dist$Comb18_Comb19 <- paste (dist$Comb18, dist$Comb19, sep="_")
       
     }
     
     morfos <- dist %>%
-      group_by(Comb19) %>%
-      summarise(sum(O), sum(Y), sum(W))
+      dplyr::group_by (Comb19) %>%
+      dplyr::summarise (sum(O), sum(Y), sum(W))
     colnames.morfos <- c ("Comb19", "O", "Y", "W")
     colnames(morfos) <- colnames.morfos
     morfos
@@ -1315,7 +1315,7 @@ repeat{
 }
 
 morfos1 <- morfos
-morfos1 <- select (morfos1, -Comb19) 
+morfos1 <- dplyr::select (morfos1, -Comb19) 
 ok.morfos <- morfos1
 
 for (i in 1:nrow(morfos1)){
@@ -1337,15 +1337,15 @@ if (sum(ok.morfos)==0)
 }
 
 morfos <- dist %>%
-  group_by(Comb19) %>%
-  summarise(sum(O), sum(Y), sum(W))
+  dplyr::group_by (Comb19) %>%
+  dplyr::summarise (sum(O), sum(Y), sum(W))
 colnames.morfos <- c ("Comb19", "O", "Y", "W")
 colnames(morfos) <- colnames.morfos
 morfos
 
 color <- dist %>%
-  group_by(Comb19) %>%
-  summarise(sum(WY), sum(WO), sum(WW), sum(YY), sum(YO), sum(OO))
+  dplyr::group_by (Comb19) %>%
+  dplyr::summarise (sum(WY), sum(WO), sum(WW), sum(YY), sum(YO), sum(OO))
 colnames.color <- c ("Comb19", "WY", "WO", "WW", "YY", "YO", "OO")
 colnames(color) <- colnames.color
 color
@@ -1362,8 +1362,8 @@ chorlito <- dist
 ##### MEDIA ####
 
 media <- dist %>%
-  group_by(Comb19) %>%
-  summarise(mean(SVL), var(SVL), 
+  dplyr::group_by (Comb19) %>%
+  dplyr::summarise (mean(SVL), var(SVL), 
             mean(BodyConditionR), var(BodyConditionR), 
             mean(TailLength), var(TailLength))
 
@@ -1411,7 +1411,7 @@ repeat{
     dist.prueba <- rbind (dist.prueba, dist.prueba1)
     
     ejemplo <- dist.prueba %>%
-      group_by(Encl18, Color2, add=TRUE)
+      dplyr::group_by (Encl18, Color2, add=TRUE)
     ejemplo
     
     vuelta.svl <- 0
@@ -1421,8 +1421,8 @@ repeat{
       dist <- dist.2
       
       media <- dist %>%
-        group_by(Comb19) %>%
-        summarise(mean(SVL), var(SVL), 
+        dplyr::group_by (Comb19) %>%
+        dplyr::summarise (mean(SVL), var(SVL), 
                   mean(BodyConditionR), var(BodyConditionR), 
                   mean(TailLength), var(TailLength))
       
@@ -1436,12 +1436,12 @@ repeat{
       media[,-1] <- round (media[, -1], 2)
       media
       
-      ejemplo <- mutate(ejemplo, Comb19.2 = sample(Comb19))
+      ejemplo <- dplyr::mutate (ejemplo, Comb19.2 = sample(Comb19))
       
       dist.prueba$Comb19.2 <- ejemplo$Comb19.2
-      si <- select (dist.prueba, fila, Comb19.2)
+      si <- dplyr::select (dist.prueba, fila, Comb19.2)
       
-      dist <- merge (dist, si, by ="fila", all=TRUE)
+      dist <- dplyr::merge (dist, si, by ="fila", all=TRUE)
       dist$Comb19.2[is.na(dist$Comb19.2)] <- 0
       
       for(i in 1:nrow(dist)){
@@ -1450,12 +1450,12 @@ repeat{
         }
       }
       
-      dist <- select (dist, -Comb19)
+      dist <- dplyr::select (dist, -Comb19)
       colnames (dist) [colnames(dist)=="Comb19.2"] <- "Comb19"
       
       media2 <- dist %>%
-        group_by(Comb19) %>%
-        summarise(mean(SVL), var(SVL), 
+        dplyr::group_by (Comb19) %>%
+        dplyr::summarise (mean(SVL), var(SVL), 
                   mean(BodyConditionR), var(BodyConditionR), 
                   mean(TailLength), var(TailLength))
       
@@ -1471,7 +1471,7 @@ repeat{
       
       ##### P.valor. dist (cambiado)
       
-      dist <- merge (dist, trat, by="Comb19")
+      dist <- dplyr::merge (dist, trat, by="Comb19")
       dist <- dist[!duplicated(dist), ]
       
       
@@ -1509,7 +1509,7 @@ repeat{
       nuevo.a.exp1.TL <- anova (lm.exp1.TL)
       nuevo.a.exp2.TL <- anova (lm.exp2.TL)
       
-      dist <- select (dist, -Lag19, -Variabilidad19)
+      dist <- dplyr::select (dist, -Lag19, -Variabilidad19)
       
       ##### P.valor. dist.2 (anterior_estable)
       
@@ -1551,7 +1551,7 @@ repeat{
       a.exp1.TL <- anova (lm.exp1.TL)
       a.exp2.TL <- anova (lm.exp2.TL)
       
-      dist.2 <- select (dist.2, -Lag19, -Variabilidad19)
+      dist.2 <- dplyr::select (dist.2, -Lag19, -Variabilidad19)
       
       if(
         ((nuevo.a.exp1.SVL$`Pr(>F)`[1]>=a.exp1.SVL$`Pr(>F)`[1])|
@@ -1684,8 +1684,8 @@ repeat{
 }
 
 media <- dist %>%
-  group_by(Comb19) %>%
-  summarise(var(SVL), var(BodyConditionR), var(TailLength))
+  dplyr::group_by (Comb19) %>%
+  dplyr::summarise (var(SVL), var(BodyConditionR), var(TailLength))
 
 
 ##### PASO 7: Asignar LAG y Variabilidad #####
@@ -1731,7 +1731,7 @@ a.exp1.TL <- anova (lm.exp1.TL)
 lm.exp2.TL <-lm (TailLength^2~Lag19 + Variabilidad19 + Lag19:Variabilidad19, data=dist.exp.2)
 a.exp2.TL <- anova (lm.exp2.TL)
 
-dist <- select (dist, -Lag19, -Variabilidad19)
+dist <- dplyr::select (dist, -Lag19, -Variabilidad19)
 
 a.exp1.SVL
 a.exp2.SVL
@@ -1744,7 +1744,7 @@ a.exp2.TL
 
 # Para asignar a la combinaci?n su lag y variabilidad
 
-dist <- merge (dist, trat, by="Comb19")
+dist <- dplyr::merge (dist, trat, by="Comb19")
 dist <- dist[!duplicated(dist), ]
 
   ##### CONTADOR repeticiones 2: cambia distribuci?n cercados 2019 #####
@@ -1805,16 +1805,16 @@ if(ya==parar)
 
 ##### PASO 10: REPEAT R1, R2, R4 #####
 
-  R9 <- count (dist, Encl18)
+  R9 <- dplyr::count (dist, Encl18)
   colnames(R9)[colnames(R9)=="n"] <- "n.Encl18"
-  dist <- select (dist, -n.Encl18)
-  dist <- merge (dist, R9, by="Encl18")
+  dist <- dplyr::select (dist, -n.Encl18)
+  dist <- dplyr::merge (dist, R9, by="Encl18")
   
   
-  enchufe <-count (dist, Comb19, Encl18)
-  enchufe <- count (enchufe, Encl18, n)
+  enchufe <-dplyr::count (dist, Comb19, Encl18)
+  enchufe <- dplyr::count (enchufe, Encl18, n)
   enchufe1 <- enchufe[enchufe$n==1,]
-  enchufe1 <- select (enchufe1, -n)
+  enchufe1 <- dplyr::select (enchufe1, -n)
   colnames(enchufe1)[colnames(enchufe1)=="nn"] <- "restar"
   
   hola <- R1.C18.C19
@@ -1834,9 +1834,9 @@ repeat{
   
  # if     (all(R9$n[1:nrow(R9)]<=Encl.19-1)) {
   
-  dist <- select(dist, -Encl18_Encl19, -n.R4, -R4, -n.Encl18)
+  dist <- dplyr::select (dist, -Encl18_Encl19, -n.R4, -R4, -n.Encl18)
   
-  dist <- merge (dist, R9, by="Encl18")
+  dist <- dplyr::merge (dist, R9, by="Encl18")
  
   # Reasignar cercados que no est?n bien
   # R4: No pueden ir juntos dos individuos que provengan del mismo cercado 
@@ -1844,17 +1844,17 @@ repeat{
   # Igual que R2, pero comprobando el n?mero de individuos de cada cercado
   # que va a cada cercado.
   
-  tabla.R4 <-  count(dist, Encl19, Encl18)
+  tabla.R4 <-  dplyr::count (dist, Encl19, Encl18)
   tabla.R4$n <- as.numeric (tabla.R4$n)
   colnames(tabla.R4)[colnames(tabla.R4)=="n"] <- "n.R4"
   tabla.R4$Encl18_Encl19 <- paste(tabla.R4$Encl18, tabla.R4$Encl19, sep="_")
-  prueba <- count (tabla.R4, Encl18)
-  prueba <- merge (prueba, R9, by="Encl18")
-  tabla.R4 <- select(tabla.R4, -Encl19, -Encl18)
+  prueba <- dplyr::count (tabla.R4, Encl18)
+  prueba <- dplyr::merge (prueba, R9, by="Encl18")
+  tabla.R4 <- dplyr::select (tabla.R4, -Encl19, -Encl18)
   
   dist$Encl18_Encl19 <- paste(dist$Encl18, dist$Encl19, sep="_")
   
-  dist<-merge(dist, tabla.R4, by="Encl18_Encl19")
+  dist<-dplyr::merge (dist, tabla.R4, by="Encl18_Encl19")
 
   for(i in 1:nrow(prueba)){
     if (prueba$n.Encl18[i]>(Encl.19-1)){
@@ -1865,7 +1865,7 @@ repeat{
   }
   
 
-  prueba <- merge (prueba, enchufe1, by="Encl18", all=TRUE)
+  prueba <- dplyr::merge (prueba, enchufe1, by="Encl18", all=TRUE)
   prueba$restar[is.na(prueba$restar)] <- 0  
   
   
@@ -1877,7 +1877,7 @@ repeat{
     }
   }
   
-  prueba<-select (prueba, -restar)
+  prueba<-dplyr::select (prueba, -restar)
   
   for (i in 1:nrow(dist)){
     if ((dist$Comb18_Comb19[i]==dist$R4_Comb18_Comb19[i])
@@ -1888,16 +1888,16 @@ repeat{
     }
   }
   
-  desesperacion <- count (dist, Encl18, n.R4, verdadero)
+  desesperacion <- dplyr::count (dist, Encl18, n.R4, verdadero)
   desesperacion <- desesperacion[desesperacion$verdadero=="VERDADERO", ]
   desesperacion <- desesperacion[desesperacion$n.R4>1, ]
   
   if (nrow(desesperacion)>1){  #A?ADIDO NUEVO (ESTA LINEA)
   
   desesperacion$cambiar <- 1
-  desesperacion <- select (desesperacion, Encl18, cambiar)
+  desesperacion <- dplyr::select (desesperacion, Encl18, cambiar)
   
-  prueba <- merge (prueba, desesperacion, by="Encl18", all=TRUE)
+  prueba <- dplyr::merge (prueba, desesperacion, by="Encl18", all=TRUE)
   prueba$cambiar[is.na(prueba$cambiar)] <- 0  
   
   
@@ -1951,11 +1951,11 @@ repeat{
   }
   
   
-  tabla.R4.2 <-  count(dist, Encl19, Encl18)
+  tabla.R4.2 <-  dplyr::count (dist, Encl19, Encl18)
   tabla.R4.2$n <- as.numeric (tabla.R4.2$n)
   
-  prueba <- count (tabla.R4.2, Encl18)
-  prueba <- merge (prueba, R9, by="Encl18")
+  prueba <- dplyr::count (tabla.R4.2, Encl18)
+  prueba <- dplyr::merge (prueba, R9, by="Encl18")
   
   
   for(i in 1:nrow(prueba)){
@@ -1967,7 +1967,7 @@ repeat{
   }
   
   
-  prueba <- merge (prueba, enchufe1, by="Encl18", all=TRUE)
+  prueba <- dplyr::merge (prueba, enchufe1, by="Encl18", all=TRUE)
   prueba$restar[is.na(prueba$restar)] <- 0  
   
   
@@ -1979,7 +1979,7 @@ repeat{
     }
   }
   
-  prueba<-select (prueba, -restar)
+  prueba<-dplyr::select (prueba, -restar)
   
   for (i in 1:nrow(dist)){
     if ((dist$Comb18_Comb19[i]==dist$R4_Comb18_Comb19[i])
@@ -1990,7 +1990,7 @@ repeat{
     }
   }
   
-  desesperacion <- count (dist, Encl18, n.R4, verdadero)
+  desesperacion <- dplyr::count (dist, Encl18, n.R4, verdadero)
   desesperacion <- desesperacion[desesperacion$verdadero=="VERDADERO", ]
   desesperacion <- desesperacion[desesperacion$n.R4>1, ]
   
@@ -1998,9 +1998,9 @@ repeat{
   if (nrow(desesperacion)>1){  #A?ADIDO NUEVO (ESTA LINEA)
     
   desesperacion$cambiar <- 1
-  desesperacion <- select (desesperacion, Encl18, cambiar)
+  desesperacion <- dplyr::select (desesperacion, Encl18, cambiar)
   
-  prueba <- merge (prueba, desesperacion, by="Encl18", all=TRUE)
+  prueba <- dplyr::merge (prueba, desesperacion, by="Encl18", all=TRUE)
   prueba$cambiar[is.na(prueba$cambiar)] <- 0  
   
   
@@ -2041,28 +2041,28 @@ if(
     # (esto lo hago para que no cambie todos los ind. en cercados que sobran bichos, 
     # sino uno de cada seis)
     
-    dist <- select(dist, -n.R2, -R2, -n.grapadora, -n.celo)
+    dist <- dplyr::select (dist, -n.R2, -R2, -n.grapadora, -n.celo)
     
-    tabla.R2 <-  count(dist, Encl19)
+    tabla.R2 <-  dplyr::count (dist, Encl19)
     tabla.R2$n <- as.numeric (tabla.R2$n)
     colnames(tabla.R2)[colnames(tabla.R2)=="n"] <- "n.R2"
     
-    dist<-merge(dist, tabla.R2, by="Encl19")
+    dist<-dplyr::merge (dist, tabla.R2, by="Encl19")
     dist <- dist[with(dist, order(dist$Animal_number1)), ] # Reordenar la tabla 
     dist$Encl18_Encl19 <- paste(dist$Encl18, dist$Encl19, sep="_")
     dist$Encl18_Comb19 <- paste(dist$Encl18, dist$Comb19, sep="_")
-    gafas <- count (dist, Encl18, Encl19)
+    gafas <- dplyr::count (dist, Encl18, Encl19)
     gafas$Encl18_Encl19 <- paste(gafas$Encl18, gafas$Encl19, sep="_")
-    gafas <- select (gafas, Encl18_Encl19, n)
+    gafas <- dplyr::select (gafas, Encl18_Encl19, n)
     colnames(gafas)[colnames(gafas)=="n"] <- "n.grapadora"
     
-    lentillas <- count (dist, Encl18, Comb19)
+    lentillas <- dplyr::count (dist, Encl18, Comb19)
     lentillas$Encl18_Comb19 <- paste(lentillas$Encl18, lentillas$Comb19, sep="_")
-    lentillas <- select (lentillas, Encl18_Comb19, n)
+    lentillas <- dplyr::select (lentillas, Encl18_Comb19, n)
     colnames(lentillas)[colnames(lentillas)=="n"] <- "n.celo"
     
-    dist <- merge (dist, gafas, by="Encl18_Encl19")
-    dist <- merge (dist, lentillas, by="Encl18_Comb19")
+    dist <- dplyr::merge (dist, gafas, by="Encl18_Encl19")
+    dist <- dplyr::merge (dist, lentillas, by="Encl18_Comb19")
     
     R2  <- 1:(nrow(dist))
     
@@ -2121,7 +2121,7 @@ if(
     
     
     
-    rest.R2 <- count (dist, Encl19)
+    rest.R2 <- dplyr::count (dist, Encl19)
     rest.R2
     
     #R2
@@ -2169,11 +2169,11 @@ if(
     {break}
   }
 
-  tabla.R4.2 <-  count(dist, Encl19, Encl18)
+  tabla.R4.2 <-  dplyr::count (dist, Encl19, Encl18)
   tabla.R4.2$n <- as.numeric (tabla.R4.2$n)
   
-  prueba <- count (tabla.R4.2, Encl18)
-  prueba <- merge (prueba, R9, by="Encl18")
+  prueba <- dplyr::count (tabla.R4.2, Encl18)
+  prueba <- dplyr::merge (prueba, R9, by="Encl18")
   
   
   for(i in 1:nrow(prueba)){
@@ -2185,7 +2185,7 @@ if(
   }
   
   
-  prueba <- merge (prueba, enchufe1, by="Encl18", all=TRUE)
+  prueba <- dplyr::merge (prueba, enchufe1, by="Encl18", all=TRUE)
   prueba$restar[is.na(prueba$restar)] <- 0  
   
   
@@ -2197,7 +2197,7 @@ if(
     }
   }
   
-  prueba<-select (prueba, -restar)
+  prueba<-dplyr::select (prueba, -restar)
   
   for (i in 1:nrow(dist)){
     if ((dist$Comb18_Comb19[i]==dist$R4_Comb18_Comb19[i])
@@ -2208,16 +2208,16 @@ if(
     }
   }
   
-  desesperacion <- count (dist, Encl18, n.R4, verdadero)
+  desesperacion <- dplyr::count (dist, Encl18, n.R4, verdadero)
   desesperacion <- desesperacion[desesperacion$verdadero=="VERDADERO", ]
   desesperacion <- desesperacion[desesperacion$n.R4>1, ]
   
   if (nrow(desesperacion)>1){  #A?ADIDO NUEVO (ESTA LINEA)
     
   desesperacion$cambiar <- 1
-  desesperacion <- select (desesperacion, Encl18, cambiar)
+  desesperacion <- dplyr::select (desesperacion, Encl18, cambiar)
   
-  prueba <- merge (prueba, desesperacion, by="Encl18", all=TRUE)
+  prueba <- dplyr::merge (prueba, desesperacion, by="Encl18", all=TRUE)
   prueba$cambiar[is.na(prueba$cambiar)] <- 0  
 
   
@@ -2242,7 +2242,7 @@ if(
   }
   prueba
   
-  rest.R2 <- count (dist, Encl19)
+  rest.R2 <- dplyr::count (dist, Encl19)
   rest.R2
   
   if(
@@ -2379,7 +2379,7 @@ varSVL <- data.frame(varSVL)
 varSVL$Encl19 <- as.factor(levels(dist.1$Encl19))
 varSVL <- na.omit (varSVL)
 
-var.SVL<-merge(varSVL,comb.encl.1, by="Encl19")
+var.SVL<-dplyr::merge (varSVL,comb.encl.1, by="Encl19")
 
 lm.var.SVL<- lm(varSVL~Lag19+Variabilidad19+Lag19:Variabilidad19, data=var.SVL)
 anova(lm.var.SVL)
@@ -2396,7 +2396,7 @@ varSVL <- data.frame(varSVL)
 varSVL$Encl19 <- as.factor(levels(dist.1$Encl19))
 varSVL <- na.omit (varSVL)
 
-var.SVL<-merge(varSVL,comb.encl.1, by="Encl19")
+var.SVL<-dplyr::merge (varSVL,comb.encl.1, by="Encl19")
 
 lm.var.SVL<- lm(varSVL~Lag19+Variabilidad19+Lag19:Variabilidad19, data=var.SVL)
 anova(lm.var.SVL)
@@ -2420,22 +2420,22 @@ bartlett.test(residuals(lm.var.SVL)~interaction(Lag19,Variabilidad19), data=var.
 ###############################################
 ##### PASO 4: Tabla te?rica de interacci?n Comb18_Comb19 #####
 
-#trat <- select (trat, -Encl19)
+#trat <- dplyr::select (trat, -Encl19)
 trat <- trat [!duplicated (trat), ]
-año2018 <-  select(dist, Lag18, Variabilidad18)
+año2018 <-  dplyr::select (dist, Lag18, Variabilidad18)
 año2018 <- año2018[!duplicated(año2018), ] 
-tabla1 <- merge (año2018, trat)
+tabla1 <- dplyr::merge (año2018, trat)
 tabla1$Comb18 <- paste(tabla1$Lag18, tabla1$Variabilidad18, sep="_")
 tabla1$Comb18_Comb19 <- paste(tabla1$Comb18, tabla1$Comb19, sep="_")
 
-tabla2 <- select (tabla1, Comb18_Comb19, Comb18, Comb19)
+tabla2 <- dplyr::select (tabla1, Comb18_Comb19, Comb18, Comb19)
 tabla2$Comb19 <- as.character(tabla2$Comb19)
 
 dist$Comb18_Comb19 <- paste(dist$Comb18, dist$Comb19, sep="_")  
 
 repeat {
   
-  R5.ideal <- merge (R5, tabla2, by ="Comb18_Comb19", all=TRUE)
+  R5.ideal <- dplyr::merge (R5, tabla2, by ="Comb18_Comb19", all=TRUE)
   R5.ideal$R5[is.na(R5.ideal$R5)] <- 0  
   #N?mero de combinaciones que existe 
   #actualmente, pero que deber?a ser 64
@@ -2446,8 +2446,8 @@ repeat {
   R5.Comb18 <- dist$Comb18[1:nrow(dist)] == R5.falta$Comb18[1] #Aparecen como "True"
   # aquellos casos en los que R5.falta$Comb18 = a la primera fila de R5.falta
   
-  dist <- select (dist, -R5)
-  dist <- merge (dist, R5, by="Comb18_Comb19")
+  dist <- dplyr::select (dist, -R5)
+  dist <- dplyr::merge (dist, R5, by="Comb18_Comb19")
   
   # HAY QUE SEGUIR ARREGLANDO A PARTIR DE AQU?
   
@@ -2483,11 +2483,11 @@ repeat {
   cont
   
   dist$Comb18_Comb19 <- paste(dist$Comb18, dist$Comb19, sep="_")
-  R5 <- count (dist, Comb18, Comb19)
+  R5 <- dplyr::count (dist, Comb18, Comb19)
   R5$Comb18_Comb19 <- paste (R5$Comb18, R5$Comb19, sep="_")
   colnames (R5) [colnames(R5)=="n"] <- "R5"
   R5$R5 <- as.numeric (R5$R5)
-  R5 <- select (R5, -Comb18, -Comb19)
+  R5 <- dplyr::select (R5, -Comb18, -Comb19)
   
   if(
     (nrow(R5)==(C.18*C.19))
@@ -2512,17 +2512,17 @@ repeat{
   #Mismo n?mero de individuos en todos los tratamientos
   repeat {
     
-    dist <- select (dist, -n.C19, -n.C18.C19)
+    dist <- dplyr::select (dist, -n.C19, -n.C18.C19)
     dist$Comb18_Comb19 <- paste (dist$Comb18, dist$Comb19, sep="_")
     
-    tabla.R3 <-  count(dist, Comb19)
+    tabla.R3 <-  dplyr::count (dist, Comb19)
     tabla.R3$n <- as.numeric (tabla.R3$n)
     colnames(tabla.R3)[colnames(tabla.R3)=="n"] <- "n.C19"
     
-    R3 <-count (dist, Comb18, Comb19)
+    R3 <-dplyr::count (dist, Comb18, Comb19)
     R3$Comb18 <- as.character (R3$Comb18)
     colnames(R3)[colnames(R3)=="n"] <- "n.C18.C19"
-    R3 <- merge (R3, tabla.R3, by="Comb19")
+    R3 <- dplyr::merge (R3, tabla.R3, by="Comb19")
     R3$Comb18_Comb19 <- paste(R3$Comb18, R3$Comb19, sep="_")
     
     C.C18 <- 1:(nrow(R3))
@@ -2568,9 +2568,9 @@ repeat{
       cambiables <-  C.C18
     } 
     
-    R3 <- select (R3, -Comb18, -Comb19)
+    R3 <- dplyr::select (R3, -Comb18, -Comb19)
     
-    dist <- merge (dist, R3, by="Comb18_Comb19")
+    dist <- dplyr::merge (dist, R3, by="Comb18_Comb19")
     
     dist$ordenar <- sample (1:nrow(dist), replace=FALSE)
     dist <- dist[with(dist, order(dist$ordenar)), ] 
@@ -2588,7 +2588,7 @@ repeat{
       }
     }
     
-    rest <- count (dist, Comb19)
+    rest <- dplyr::count (dist, Comb19)
     rest 
     
     if(
@@ -2600,11 +2600,11 @@ repeat{
   #Interacci?n Comb18_Comb19 tiene el mismo n?mero de individuos
   repeat{
     
-    dist <- select (dist, -n.rest2)
+    dist <- dplyr::select (dist, -n.rest2)
     dist$Comb18_Comb19 <- paste(dist$Comb18, dist$Comb19, sep="_")
-    rest2 <- count (dist, Comb18_Comb19)
+    rest2 <- dplyr::count (dist, Comb18_Comb19)
     colnames(rest2)[colnames(rest2)=="n"] <- "n.rest2"
-    dist <- merge (dist, rest2, by="Comb18_Comb19")
+    dist <- dplyr::merge (dist, rest2, by="Comb18_Comb19")
     dist$Comb18 <- as.character(dist$Comb18)
     
     necesitados <- 1:nrow(dist)
@@ -2646,13 +2646,13 @@ repeat{
     
     dist$Comb18_Comb19 <- paste(dist$Comb18, dist$Comb19, sep="_")
     
-    R5.3 <-  count(dist, Comb18, Comb19)
+    R5.3 <-  dplyr::count (dist, Comb18, Comb19)
     R5.3$n <- as.numeric (R5.3$n)
     colnames(R5.3)[colnames(R5.3)=="n"] <- "R5.3"
-    R.Comb18 <- count (dist, Comb18)
-    R.Comb18 <- mutate(R.Comb18, balance = ceiling (R.Comb18$n/C.19))
-    R.Comb18 <- select (R.Comb18, -n)
-    R5.3 <- merge (R5.3, R.Comb18, by ="Comb18")
+    R.Comb18 <- dplyr::count (dist, Comb18)
+    R.Comb18 <- dplyr::mutate (R.Comb18, balance = ceiling (R.Comb18$n/C.19))
+    R.Comb18 <- dplyr::select (R.Comb18, -n)
+    R5.3 <- dplyr::merge (R5.3, R.Comb18, by ="Comb18")
     R5.3
     
     if (
@@ -2662,12 +2662,12 @@ repeat{
       
     {break}
   }
-  count (dist, Comb19)
+  dplyr::count (dist, Comb19)
   
-  dist <- select (dist, -n.C18.C19, -caben, -n.caben, -caben.bueno)
+  dist <- dplyr::select (dist, -n.C18.C19, -caben, -n.caben, -caben.bueno)
   dist$Comb18_Comb19 <- paste(dist$Comb18, dist$Comb19, sep="_")
   
-  dist <- merge (dist, R1.n.caben, by="Comb18_Comb19", all=TRUE)
+  dist <- dplyr::merge (dist, R1.n.caben, by="Comb18_Comb19", all=TRUE)
   dist$n.caben[is.na(dist$n.caben)] <- 0  
   dist$caben <- Encl.18/C.18*Encl.19/C.19
   
@@ -2695,17 +2695,17 @@ repeat{
   }
   ###################################
   
-  R3 <-count (dist, Comb18, Comb19)
+  R3 <-dplyr::count (dist, Comb18, Comb19)
   R3$Comb18 <- as.character (R3$Comb18)
   R3$Comb18_Comb19 <- paste(R3$Comb18, R3$Comb19, sep="_")
-  R3 <- select (R3, -Comb19, -Comb18)
+  R3 <- dplyr::select (R3, -Comb19, -Comb18)
   colnames(R3)[colnames(R3)=="n"] <- "n.C18.C19"
-  dist <- merge (dist, R3, by="Comb18_Comb19")
+  dist <- dplyr::merge (dist, R3, by="Comb18_Comb19")
   
-  n.C19 <- count (dist, Comb19)
+  n.C19 <- dplyr::count (dist, Comb19)
   colnames(n.C19)[colnames(n.C19)=="n"] <- "n.C19"
-  dist <- select (dist, -n.C19)
-  dist <- merge (dist, n.C19, by="Comb19")
+  dist <- dplyr::select (dist, -n.C19)
+  dist <- dplyr::merge (dist, n.C19, by="Comb19")
   
   repeat{
     
@@ -2785,10 +2785,10 @@ repeat{
       cont
     }
     
-    dist <- select (dist, -n.C18.C19, -caben, -n.caben, -caben.bueno)
+    dist <- dplyr::select (dist, -n.C18.C19, -caben, -n.caben, -caben.bueno)
     dist$Comb18_Comb19 <- paste(dist$Comb18, dist$Comb19, sep="_")
     
-    dist <- merge (dist, R1.n.caben, by="Comb18_Comb19", all=TRUE)
+    dist <- dplyr::merge (dist, R1.n.caben, by="Comb18_Comb19", all=TRUE)
     dist$n.caben[is.na(dist$n.caben)] <- 0  
     dist$caben <- Encl.18/C.18*Encl.19/C.19
     
@@ -2816,22 +2816,22 @@ repeat{
     }
     ###################################
     
-    R3 <-count (dist, Comb18, Comb19)
+    R3 <-dplyr::count (dist, Comb18, Comb19)
     R3$Comb18 <- as.character (R3$Comb18)
     R3$Comb18_Comb19 <- paste(R3$Comb18, R3$Comb19, sep="_")
-    R3 <- select (R3, -Comb19, -Comb18)
+    R3 <- dplyr::select (R3, -Comb19, -Comb18)
     colnames(R3)[colnames(R3)=="n"] <- "n.C18.C19"
-    dist <- merge (dist, R3, by="Comb18_Comb19")
+    dist <- dplyr::merge (dist, R3, by="Comb18_Comb19")
     
-    n.C19 <- count (dist, Comb19)
+    n.C19 <- dplyr::count (dist, Comb19)
     colnames(n.C19)[colnames(n.C19)=="n"] <- "n.C19"
-    dist <- select (dist, -n.C19)
-    dist <- merge (dist, n.C19, by="Comb19")
+    dist <- dplyr::select (dist, -n.C19)
+    dist <- dplyr::merge (dist, n.C19, by="Comb19")
     
     cascos <- dist$n.C18.C19>dist$caben.bueno
     cascos <- sum(cascos == "TRUE")
     
-    rest4 <- count (dist, Comb19)  
+    rest4 <- dplyr::count (dist, Comb19)  
     rest4
     
     if(
@@ -2936,10 +2936,10 @@ repeat{
       }
       cont
       
-      dist <- select (dist, -n.C18.C19, -caben, -n.caben, -caben.bueno)
+      dist <- dplyr::select (dist, -n.C18.C19, -caben, -n.caben, -caben.bueno)
       dist$Comb18_Comb19 <- paste(dist$Comb18, dist$Comb19, sep="_")
       
-      dist <- merge (dist, R1.n.caben, by="Comb18_Comb19", all=TRUE)
+      dist <- dplyr::merge (dist, R1.n.caben, by="Comb18_Comb19", all=TRUE)
       dist$n.caben[is.na(dist$n.caben)] <- 0  
       dist$caben <- Encl.18/C.18*Encl.19/C.19
       
@@ -2967,20 +2967,20 @@ repeat{
       }
       ###################################
       
-      R3 <-count (dist, Comb18, Comb19)
+      R3 <-dplyr::count (dist, Comb18, Comb19)
       R3$Comb18 <- as.character (R3$Comb18)
       R3$Comb18_Comb19 <- paste(R3$Comb18, R3$Comb19, sep="_")
-      R3 <- select (R3, -Comb19, -Comb18)
+      R3 <- dplyr::select (R3, -Comb19, -Comb18)
       colnames(R3)[colnames(R3)=="n"] <- "n.C18.C19"
-      dist <- merge (dist, R3, by="Comb18_Comb19")
+      dist <- dplyr::merge (dist, R3, by="Comb18_Comb19")
       
-      n.C19 <- count (dist, Comb19)
+      n.C19 <- dplyr::count (dist, Comb19)
       colnames(n.C19)[colnames(n.C19)=="n"] <- "n.C19"
-      dist <- select (dist, -n.C19)
-      dist <- merge (dist, n.C19, by="Comb19")
+      dist <- dplyr::select (dist, -n.C19)
+      dist <- dplyr::merge (dist, n.C19, by="Comb19")
       
       
-      rest4 <- count (dist, Comb19)
+      rest4 <- dplyr::count (dist, Comb19)
       rest4
       
       if(
@@ -3089,10 +3089,10 @@ repeat{
       }
       cont
       
-      dist <- select (dist, -n.C18.C19, -caben, -n.caben, -caben.bueno)
+      dist <- dplyr::select (dist, -n.C18.C19, -caben, -n.caben, -caben.bueno)
       dist$Comb18_Comb19 <- paste(dist$Comb18, dist$Comb19, sep="_")
       
-      dist <- merge (dist, R1.n.caben, by="Comb18_Comb19", all=TRUE)
+      dist <- dplyr::merge (dist, R1.n.caben, by="Comb18_Comb19", all=TRUE)
       dist$n.caben[is.na(dist$n.caben)] <- 0  
       dist$caben <- Encl.18/C.18*Encl.19/C.19
       
@@ -3120,20 +3120,20 @@ repeat{
       }
       ###################################
       
-      R3 <-count (dist, Comb18, Comb19)
+      R3 <-dplyr::count (dist, Comb18, Comb19)
       R3$Comb18 <- as.character (R3$Comb18)
       R3$Comb18_Comb19 <- paste(R3$Comb18, R3$Comb19, sep="_")
-      R3 <- select (R3, -Comb19, -Comb18)
+      R3 <- dplyr::select (R3, -Comb19, -Comb18)
       colnames(R3)[colnames(R3)=="n"] <- "n.C18.C19"
-      dist <- merge (dist, R3, by="Comb18_Comb19")
+      dist <- dplyr::merge (dist, R3, by="Comb18_Comb19")
       
-      n.C19 <- count (dist, Comb19)
+      n.C19 <- dplyr::count (dist, Comb19)
       colnames(n.C19)[colnames(n.C19)=="n"] <- "n.C19"
-      dist <- select (dist, -n.C19)
-      dist <- merge (dist, n.C19, by="Comb19")
+      dist <- dplyr::select (dist, -n.C19)
+      dist <- dplyr::merge (dist, n.C19, by="Comb19")
       
       
-      rest <- count (dist, Comb19)
+      rest <- dplyr::count (dist, Comb19)
       
       if(
         (all(rest$n[1:nrow(rest)]==(nrow (dist)/C.19)))
@@ -3142,15 +3142,15 @@ repeat{
       {break}
     }
     
-    R5.3 <-  count(dist, Comb18, Comb19)
+    R5.3 <-  dplyr::count (dist, Comb18, Comb19)
     R5.3$n <- as.numeric (R5.3$n)
     colnames(R5.3)[colnames(R5.3)=="n"] <- "R5.3"
-    R.Comb18 <- count (dist, Comb18)
-    R.Comb18 <- mutate(R.Comb18, balance = ceiling (R.Comb18$n/C.19))
-    R.Comb18 <- select (R.Comb18, -n)
-    R5.3 <- merge (R5.3, R.Comb18, by ="Comb18")
+    R.Comb18 <- dplyr::count (dist, Comb18)
+    R.Comb18 <- dplyr::mutate (R.Comb18, balance = ceiling (R.Comb18$n/C.19))
+    R.Comb18 <- dplyr::select (R.Comb18, -n)
+    R5.3 <- dplyr::merge (R5.3, R.Comb18, by ="Comb18")
     R5.3
-    rest4 <- count (dist, Comb19)  
+    rest4 <- dplyr::count (dist, Comb19)  
     rest4
     
   }
@@ -3161,12 +3161,12 @@ repeat{
     dist$Comb18_Comb19 <- paste(dist$Comb18, dist$Comb19, sep="_")
     
     
-    R5.3.1 <- count(dist, Comb18, Comb19)
+    R5.3.1 <- dplyr::count (dist, Comb18, Comb19)
     colnames(R5.3.1)[colnames(R5.3.1)=="n"] <- "R5.3"
     R5.3.1$Comb18_Comb19 <- paste(R5.3$Comb18, R5.3$Comb19, sep="_")
-    R5.3.1 <- select(R5.3.1, Comb18_Comb19, R5.3)
-    dist <- select (dist, -R5.3)
-    dist <- merge (dist, R5.3.1, by="Comb18_Comb19")
+    R5.3.1 <- dplyr::select (R5.3.1, Comb18_Comb19, R5.3)
+    dist <- dplyr::select (dist, -R5.3)
+    dist <- dplyr::merge (dist, R5.3.1, by="Comb18_Comb19")
     
     cargador <- 1:nrow(ind.Comb.Encl)
     for(i in 1:nrow(ind.Comb.Encl)){  
@@ -3228,10 +3228,10 @@ repeat{
     
     
     
-    dist <- select (dist, -n.C18.C19, -caben, -n.caben, -caben.bueno)
+    dist <- dplyr::select (dist, -n.C18.C19, -caben, -n.caben, -caben.bueno)
     dist$Comb18_Comb19 <- paste(dist$Comb18, dist$Comb19, sep="_")
     
-    dist <- merge (dist, R1.n.caben, by="Comb18_Comb19", all=TRUE)
+    dist <- dplyr::merge (dist, R1.n.caben, by="Comb18_Comb19", all=TRUE)
     dist$n.caben[is.na(dist$n.caben)] <- 0  
     dist$caben <- Encl.18/C.18*Encl.19/C.19
     
@@ -3259,28 +3259,28 @@ repeat{
     }
     ###################################
     
-    R3 <-count (dist, Comb18, Comb19)
+    R3 <-dplyr::count (dist, Comb18, Comb19)
     R3$Comb18 <- as.character (R3$Comb18)
     R3$Comb18_Comb19 <- paste(R3$Comb18, R3$Comb19, sep="_")
-    R3 <- select (R3, -Comb19, -Comb18)
+    R3 <- dplyr::select (R3, -Comb19, -Comb18)
     colnames(R3)[colnames(R3)=="n"] <- "n.C18.C19"
-    dist <- merge (dist, R3, by="Comb18_Comb19")
+    dist <- dplyr::merge (dist, R3, by="Comb18_Comb19")
     
-    n.C19 <- count (dist, Comb19)
+    n.C19 <- dplyr::count (dist, Comb19)
     colnames(n.C19)[colnames(n.C19)=="n"] <- "n.C19"
-    dist <- select (dist, -n.C19)
-    dist <- merge (dist, n.C19, by="Comb19")
+    dist <- dplyr::select (dist, -n.C19)
+    dist <- dplyr::merge (dist, n.C19, by="Comb19")
     
     
-    R5.3 <-  count(dist, Comb18, Comb19)
+    R5.3 <-  dplyr::count (dist, Comb18, Comb19)
     R5.3$n <- as.numeric (R5.3$n)
     colnames(R5.3)[colnames(R5.3)=="n"] <- "R5.3"
-    R.Comb18 <- count (dist, Comb18)
-    R.Comb18 <- mutate(R.Comb18, balance = ceiling (R.Comb18$n/C.19))
-    R.Comb18 <- select (R.Comb18, -n)
-    R5.3 <- merge (R5.3, R.Comb18, by ="Comb18")
+    R.Comb18 <- dplyr::count (dist, Comb18)
+    R.Comb18 <- dplyr::mutate (R.Comb18, balance = ceiling (R.Comb18$n/C.19))
+    R.Comb18 <- dplyr::select (R.Comb18, -n)
+    R5.3 <- dplyr::merge (R5.3, R.Comb18, by ="Comb18")
     R5.3
-    rest4 <- count (dist, Comb19)  
+    rest4 <- dplyr::count (dist, Comb19)  
     rest4
     
     
@@ -3308,7 +3308,7 @@ repeat{
   ##### Arreglar los color- al derecho #####
   
   dist.prueba <- dist
-  vector.color <- count (dist.prueba, Color2)
+  vector.color <- dplyr::count (dist.prueba, Color2)
   vector.color <- vector.color[with(vector.color, order(vector.color$n)), ] 
   
   vector.color <- vector.color$Color2
@@ -3320,8 +3320,8 @@ repeat{
   repeat{
     
     color <- dist %>%
-      group_by(Comb19) %>%
-      summarise(sum(WY), sum(WO), sum(WW), sum(YY), sum(YO), sum(OO))
+      dplyr::group_by (Comb19) %>%
+      dplyr::summarise (sum(WY), sum(WO), sum(WW), sum(YY), sum(YO), sum(OO))
     colnames.color <- c ("Comb19", "WY", "WO", "WW", "YY", "YO", "OO")
     colnames(color) <- colnames.color
     color
@@ -3399,27 +3399,27 @@ repeat{
           okis <- okis[-c(1)]
         }
       }
-      dist.color <- filter (dist.color, Y>0)
-      count (dist.color, Comb19)
+      dist.color <- dplyr::filter (dist.color, Y>0)
+      dplyr::count (dist.color, Comb19)
       
       hartura <-  100   
       
       repeat {
         
-        dist.color4 <- select (dist.color, fila, Encl18, Comb19)
+        dist.color4 <- dplyr::select (dist.color, fila, Encl18, Comb19)
         
         dist.color4 <- dist.color4 %>%
-          group_by(Encl18)
-        dist.color4 <- mutate(dist.color4, Comb19.2 = sample(Comb19))
+          dplyr::group_by (Encl18)
+        dist.color4 <- dplyr::mutate (dist.color4, Comb19.2 = sample(Comb19))
         
         dist.color$Comb19.2 <- dist.color4$Comb19.2
         
-        dist.color <- select (dist.color, -Comb19)
+        dist.color <- dplyr::select (dist.color, -Comb19)
         colnames (dist.color) [colnames(dist.color)=="Comb19.2"] <- "Comb19"
         
         colnames (dist.color) [colnames(dist.color)=="Comb19"] <- "Comb19.3"
-        Comb19.3 <- select (dist.color, fila, Comb19.3)
-        dist <- merge (dist, Comb19.3, by="fila", all=TRUE)
+        Comb19.3 <- dplyr::select (dist.color, fila, Comb19.3)
+        dist <- dplyr::merge (dist, Comb19.3, by="fila", all=TRUE)
         dist$Comb19.3[is.na(dist$Comb19.3)] <- 0  
         colnames (dist.color) [colnames(dist.color)=="Comb19.3"] <- "Comb19"
         
@@ -3428,7 +3428,7 @@ repeat{
             dist$Comb19.3[i] <-  dist$Comb19[i]
           }
         }
-        dist <- select (dist, -Comb19)
+        dist <- dplyr::select (dist, -Comb19)
         colnames (dist) [colnames(dist)=="Comb19.3"] <- "Comb19"
         dist$Comb18_Comb19 <- paste (dist$Comb18, dist$Comb19, sep="_")
         
@@ -3436,8 +3436,8 @@ repeat{
         ### NO FALTAR?A AQU? CREAR LOS COLORES???? ###
         
         color <- dist %>%
-          group_by(Comb19) %>%
-          summarise(sum(WY), sum(WO), sum(WW), sum(YY), sum(YO), sum(OO))
+          dplyr::group_by (Comb19) %>%
+          dplyr::summarise (sum(WY), sum(WO), sum(WW), sum(YY), sum(YO), sum(OO))
         colnames.color <- c ("Comb19", "WY", "WO", "WW", "YY", "YO", "OO")
         colnames(color) <- colnames.color
         color
@@ -3506,7 +3506,7 @@ repeat{
               okis <- okis[-c(1)]
             }
           }
-          count (dist.color, Comb19)
+          dplyr::count (dist.color, Comb19)
           
           
           
@@ -3514,7 +3514,7 @@ repeat{
         
         color
         ok
-        count (dist.color, Comb19)
+        dplyr::count (dist.color, Comb19)
         
         hartura <- hartura + 1 
         print (hartura)
@@ -3529,11 +3529,11 @@ repeat{
     color
     
     dist.menos <- dist 
-    dist.menos <- select (dist.menos, fila, Comb19)
+    dist.menos <- dplyr::select (dist.menos, fila, Comb19)
     
     colnames (dist.menos) [colnames(dist.menos)=="Comb19"] <- "Comb19.2"
     
-    dist.prueba <- merge (dist.prueba, dist.menos, by="fila", all=TRUE)
+    dist.prueba <- dplyr::merge (dist.prueba, dist.menos, by="fila", all=TRUE)
     dist.prueba$Comb19.2[is.na(dist.prueba$Comb19.2)] <- 0  
     
     for(i in 1:nrow(dist.prueba)){
@@ -3542,7 +3542,7 @@ repeat{
       }
     }
     
-    dist.prueba <- select (dist.prueba, -Comb19)
+    dist.prueba <- dplyr::select (dist.prueba, -Comb19)
     colnames (dist.prueba) [colnames(dist.prueba)=="Comb19.2"] <- "Comb19"
     dist.prueba$Comb18_Comb19 <- paste (dist.prueba$Comb18, dist.prueba$Comb19, sep="_")
     
@@ -3562,8 +3562,8 @@ repeat{
   dist <- dist.prueba
   
   color <- dist %>%
-    group_by(Comb19) %>%
-    summarise(sum(WY), sum(WO), sum(WW), sum(YY), sum(YO), sum(OO))
+    dplyr::group_by (Comb19) %>%
+    dplyr::summarise (sum(WY), sum(WO), sum(WW), sum(YY), sum(YO), sum(OO))
   colnames.color <- c ("Comb19", "WY", "WO", "WW", "YY", "YO", "OO")
   colnames(color) <- colnames.color
   color
@@ -3572,7 +3572,7 @@ repeat{
   ##### Arreglar los color - a la inversa #####
   
   dist.prueba <- dist
-  vector.color <- count (dist.prueba, Color2)
+  vector.color <- dplyr::count (dist.prueba, Color2)
   vector.color <- vector.color[with(vector.color, order(-vector.color$n)), ] 
   
   vector.color <- vector.color$Color2
@@ -3584,8 +3584,8 @@ repeat{
   repeat{
     
     color <- dist %>%
-      group_by(Comb19) %>%
-      summarise(sum(WY), sum(WO), sum(WW), sum(YY), sum(YO), sum(OO))
+      dplyr::group_by (Comb19) %>%
+      dplyr::summarise (sum(WY), sum(WO), sum(WW), sum(YY), sum(YO), sum(OO))
     colnames.color <- c ("Comb19", "WY", "WO", "WW", "YY", "YO", "OO")
     colnames(color) <- colnames.color
     color
@@ -3662,27 +3662,27 @@ repeat{
           okis <- okis[-c(1)]
         }
       }
-      count (dist.color, Comb19)
+      dplyr::count (dist.color, Comb19)
       
       hartura <-  100   
       hartura <-  100   
       
       repeat {
         
-        dist.color4 <- select (dist.color, fila, Encl18, Comb19)
+        dist.color4 <- dplyr::select (dist.color, fila, Encl18, Comb19)
         
         dist.color4 <- dist.color4 %>%
-          group_by(Encl18)
-        dist.color4 <- mutate(dist.color4, Comb19.2 = sample(Comb19))
+          dplyr::group_by (Encl18)
+        dist.color4 <- dplyr::mutate (dist.color4, Comb19.2 = sample(Comb19))
         
         dist.color$Comb19.2 <- dist.color4$Comb19.2
         
-        dist.color <- select (dist.color, -Comb19)
+        dist.color <- dplyr::select (dist.color, -Comb19)
         colnames (dist.color) [colnames(dist.color)=="Comb19.2"] <- "Comb19"
         
         colnames (dist.color) [colnames(dist.color)=="Comb19"] <- "Comb19.3"
-        Comb19.3 <- select (dist.color, fila, Comb19.3)
-        dist <- merge (dist, Comb19.3, by="fila", all=TRUE)
+        Comb19.3 <- dplyr::select (dist.color, fila, Comb19.3)
+        dist <- dplyr::merge (dist, Comb19.3, by="fila", all=TRUE)
         dist$Comb19.3[is.na(dist$Comb19.3)] <- 0  
         colnames (dist.color) [colnames(dist.color)=="Comb19.3"] <- "Comb19"
         
@@ -3691,7 +3691,7 @@ repeat{
             dist$Comb19.3[i] <-  dist$Comb19[i]
           }
         }
-        dist <- select (dist, -Comb19)
+        dist <- dplyr::select (dist, -Comb19)
         colnames (dist) [colnames(dist)=="Comb19.3"] <- "Comb19"
         dist$Comb18_Comb19 <- paste (dist$Comb18, dist$Comb19, sep="_")
         
@@ -3699,8 +3699,8 @@ repeat{
         ### NO FALTAR?A AQU? CREAR LOS COLORES???? ###
         
         color <- dist %>%
-          group_by(Comb19) %>%
-          summarise(sum(WY), sum(WO), sum(WW), sum(YY), sum(YO), sum(OO))
+          dplyr::group_by (Comb19) %>%
+          dplyr::summarise (sum(WY), sum(WO), sum(WW), sum(YY), sum(YO), sum(OO))
         colnames.color <- c ("Comb19", "WY", "WO", "WW", "YY", "YO", "OO")
         colnames(color) <- colnames.color
         color
@@ -3769,7 +3769,7 @@ repeat{
               okis <- okis[-c(1)]
             }
           }
-          count (dist.color, Comb19)
+          dplyr::count (dist.color, Comb19)
           
           
           
@@ -3777,7 +3777,7 @@ repeat{
         
         color
         ok
-        count (dist.color, Comb19)
+        dplyr::count (dist.color, Comb19)
         
         hartura <- hartura + 1 
         print (hartura)
@@ -3792,11 +3792,11 @@ repeat{
     color
     
     dist.menos <- dist 
-    dist.menos <- select (dist.menos, fila, Comb19)
+    dist.menos <- dplyr::select (dist.menos, fila, Comb19)
     
     colnames (dist.menos) [colnames(dist.menos)=="Comb19"] <- "Comb19.2"
     
-    dist.prueba <- merge (dist.prueba, dist.menos, by="fila", all=TRUE)
+    dist.prueba <- dplyr::merge (dist.prueba, dist.menos, by="fila", all=TRUE)
     dist.prueba$Comb19.2[is.na(dist.prueba$Comb19.2)] <- 0  
     
     for(i in 1:nrow(dist.prueba)){
@@ -3805,7 +3805,7 @@ repeat{
       }
     }
     
-    dist.prueba <- select (dist.prueba, -Comb19)
+    dist.prueba <- dplyr::select (dist.prueba, -Comb19)
     colnames (dist.prueba) [colnames(dist.prueba)=="Comb19.2"] <- "Comb19"
     dist.prueba$Comb18_Comb19 <- paste (dist.prueba$Comb18, dist.prueba$Comb19, sep="_")
     
@@ -3825,8 +3825,8 @@ repeat{
   dist <- dist.prueba
   
   color <- dist %>%
-    group_by(Comb19) %>%
-    summarise(sum(WY), sum(WO), sum(WW), sum(YY), sum(YO), sum(OO))
+    dplyr::group_by (Comb19) %>%
+    dplyr::summarise (sum(WY), sum(WO), sum(WW), sum(YY), sum(YO), sum(OO))
   colnames.color <- c ("Comb19", "WY", "WO", "WW", "YY", "YO", "OO")
   colnames(color) <- colnames.color
   color
@@ -3834,7 +3834,7 @@ repeat{
   ###### hasta aqu? #####
   
   color1 <- color
-  color1 <- select (color1, -Comb19) 
+  color1 <- dplyr::select (color1, -Comb19) 
   ok <- color1
   
   for (i in 1:nrow(color1)){
